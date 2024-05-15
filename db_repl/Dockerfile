@@ -1,0 +1,7 @@
+FROM postgres:15
+
+ENV POSTGRES_PASSWORD=Qq12345
+
+EXPOSE 5432
+
+CMD ["postgres"]
