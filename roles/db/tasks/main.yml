@@ -68,8 +68,8 @@
     owner: "{{ USER_NAME }}"
     port: "{{ PORT }}"
     columns:
-      - id VARCHAR(100) SERIAL PRIMARY KEY
-      - email VARCHAR(500) NOT NULL
+      - id SERIAL PRIMARY KEY
+      - email VARCHAR(100) NOT NULL
   become_user: postgres
 
 - name: Create Table phone_numbers
