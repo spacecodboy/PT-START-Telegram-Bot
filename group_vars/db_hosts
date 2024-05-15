@@ -1,0 +1,5 @@
+user_replication: repl_user
+password_replication: qwerty
+ansible_repl_host: 
+ansible_master_host: 
+PORT: 

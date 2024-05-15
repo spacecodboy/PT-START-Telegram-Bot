@@ -1,0 +1,100 @@
+- name: Install packages
+  apt: "name={{ item }} state=present"
+  with_items:
+    - postgresql-15
+    - postgresql-contrib
+    - net-tools
+
+- name: Access login postgres
+  lineinfile:
+    path: /etc/postgresql/15/main/pg_hba.conf
+    line: "host all all {{ hostvars[inventory_hostname]['ansible_host'] }}/32 trust"
+    insertafter: EOF
+    state: present
+  notify:
+    - Restart db
+
+
+- name: Flush handlers
+  meta: flush_handlers
+
+
+- name: Create WAL directory
+  ansible.builtin.file:
+    path: /data/WAL/archive/
+    state: directory
+    owner: postgres
+    group: postgres
+
+
+- name: Set Postgres settings
+  community.postgresql.postgresql_set:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+  become_user: postgres
+  with_dict: {archive_mode: "on", archive_command: "cp %p /data/WAL/archive/%f", max_wal_senders: 10, wal_level: replica, wal_log_hints: "on", listen_addresses: '*', port: "{{ PORT }}"}
+  notify:
+    - Restart db
+
+- name: "Flush handlers"
+  meta: flush_handlers
+
+- name: Create Replicator
+  community.postgresql.postgresql_user:
+    name: "{{ user_replication }}"
+    password: "{{ password_replication }}"
+    role_attr_flags: REPLICATION
+    port: "{{ PORT }}"
+  become_user: postgres
+
+- name: Create user
+  community.postgresql.postgresql_user:
+    name: "{{ USER_NAME }}"
+    password: "{{ PASSWORD_USER }}"
+    port: "{{ PORT }}"
+  become_user: postgres
+
+- name: Create DataBases
+  community.postgresql.postgresql_db:
+    name: "{{ DB_NAME  }}"
+    owner: "{{ USER_NAME }}"
+    port: "{{ PORT }}"
+  become_user: postgres
+
+- name: Create Table emails
+  community.postgresql.postgresql_table:
+    db: "{{ DB_NAME }}"
+    table: "emails"
+    owner: "{{ USER_NAME }}"
+    port: "{{ PORT }}"
+    columns:
+      - user_id VARCHAR(50) PRIMARY KEY NOT NULL
+      - found_emails VARCHAR(500)
+  become_user: postgres
+
+- name: Create Table phone
+  community.postgresql.postgresql_table:
+    db: "{{ DB_NAME }}"
+    table: "phones"
+    owner: "{{ USER_NAME }}"
+    port: "{{ PORT }}"
+    columns:
+      - user_id VARCHAR(50) PRIMARY KEY NOT NULL
+      - found_numbers_phone VARCHAR(500)
+  become_user: postgres
+
+- name: Replace pg_hba.conf
+  lineinfile:
+    path: /etc/postgresql/15/main/pg_hba.conf
+    regexp: "^host all all {{ hostvars[inventory_hostname]['ansible_host'] }}/32 trust$"
+    line: "host replication {{ user_replication }} {{ ansible_repl_host }}/32 md5\nhost all all {{ hostvars[inventory_hostname]['ansible_host'] }}/32 password"
+  notify:
+    - Restart db
+
+- name: "Flush handlers"
+  meta: flush_handlers
+
+- name: Set permissions for other to read
+  file:
+    path: /var/log/postgresql/postgresql-15-main.log
+    mode: "o+r"

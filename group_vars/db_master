@@ -1,0 +1,8 @@
+ansible_host: "{{ ansible_master_host }}"
+ansible_user: 
+ansible_password: 
+ansible_become_pass: 
+
+DB_NAME: ""
+USER_NAME: ""
+PASSWORD_USER: 

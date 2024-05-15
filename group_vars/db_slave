@@ -1,0 +1,4 @@
+ansible_host: "{{ ansible_repl_host }}"
+ansible_user: 
+ansible_password: 
+ansible_become_pass: 

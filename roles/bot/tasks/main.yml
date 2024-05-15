@@ -1,3 +1,11 @@
+- name: "Install packages"
+  apt: "name={{ item }} state=present"
+  with_items:
+    - python3-full
+    - virtualenv
+    - python3-psycopg2
+    - git
+    
 - name: Install dependencies
   apt:
     name: 
@@ -7,7 +15,7 @@
 
 - name: Clone repository
   git:
-    repo: https://github.com/Garret47/PT_Telegram_Bot.git
+    repo: https://github.com/spacecodboy/PT-START-Telegram-Bot.git
     dest: /home/user/bot/
     version: bot
 
@@ -20,3 +28,8 @@
   copy:
     src: ./.env
     dest: /home/user/bot/
+
+- name: Start Bot
+  shell:
+    chdir: /home/user/bot
+    cmd: "../venv/bin/python main.py >/dev/null 2>&1 &"
