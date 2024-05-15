@@ -36,7 +36,7 @@
   notify:
     - Restart db
 
-- name: "Flush handlers"
+- name: Flush handlers
   meta: flush_handlers
 
 - name: Create Replicator
@@ -68,19 +68,19 @@
     owner: "{{ USER_NAME }}"
     port: "{{ PORT }}"
     columns:
-      - user_id VARCHAR(50) PRIMARY KEY NOT NULL
-      - found_emails VARCHAR(500)
+      - id VARCHAR(100) SERIAL PRIMARY KEY
+      - email VARCHAR(500) NOT NULL
   become_user: postgres
 
-- name: Create Table phone
+- name: Create Table phone_numbers
   community.postgresql.postgresql_table:
     db: "{{ DB_NAME }}"
-    table: "phones"
+    table: "phone_numbers"
     owner: "{{ USER_NAME }}"
     port: "{{ PORT }}"
     columns:
-      - user_id VARCHAR(50) PRIMARY KEY NOT NULL
-      - found_numbers_phone VARCHAR(500)
+      - id SERIAL PRIMARY KEY
+      - phone_number VARCHAR(18)
   become_user: postgres
 
 - name: Replace pg_hba.conf
@@ -91,7 +91,7 @@
   notify:
     - Restart db
 
-- name: "Flush handlers"
+- name: Flush handlers
   meta: flush_handlers
 
 - name: Set permissions for other to read

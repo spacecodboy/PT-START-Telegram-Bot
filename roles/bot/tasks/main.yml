@@ -1,3 +1,4 @@
+
 - name: "Install packages"
   apt: "name={{ item }} state=present"
   with_items:
@@ -21,7 +22,7 @@
 
 - name: Activate Environment
   pip:
-    requirements: /home/user/bot/requirements.txt
+    requirements: /home/user/bot/requirments.txt
     virtualenv: /home/user/venv
 
 - name: Copy .env
@@ -32,4 +33,4 @@
 - name: Start Bot
   shell:
     chdir: /home/user/bot
-    cmd: "../venv/bin/python main.py >/dev/null 2>&1 &"
+    cmd: "../venv/bin/python main.py"
