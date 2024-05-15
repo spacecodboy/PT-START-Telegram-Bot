@@ -5,4 +5,4 @@ ansible_become_pass: qwerty
 
 DB_NAME: "telegram_bot"
 USER_NAME: "postgres"
-PASSWORD_USER: Qq12345
+PASSWORD_USER: "Qq12345"
