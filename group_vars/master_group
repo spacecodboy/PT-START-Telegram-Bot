@@ -1,7 +1,7 @@
 ansible_host: "{{ ansible_master_host }}"
-ansible_user: kali
-ansible_password: kali
-ansible_become_pass: kali
+ansible_user: master
+ansible_password: qwerty
+ansible_become_pass: qwerty
 
 DB_DATABASE: "telegram_bot"
 DB_USER: "postgres"
