@@ -100,8 +100,8 @@
   become_user: postgres
 
 - name: Grant read permission to a specific user
-      acl:
-        path: /var/log/postgresql/postgresql-15-main.log
-        entity: "{{ ansible_user }}"
-        etype: user
-        permissions: r
+  acl:
+    path: /var/log/postgresql/postgresql-15-main.log
+    entity: "{{ ansible_user }}"
+    etype: user
+    permissions: r

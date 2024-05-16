@@ -1,9 +1,9 @@
-[hosts]
+[hosts_group]
 master
 slave
 
-[master]
+[master_group]
 master
 
-[slave]
+[slave_group]
 slave
