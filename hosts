@@ -1,9 +1,9 @@
-[db_hosts]
+[hosts]
 master
 slave
 
-[db_master]
+[master]
 master
 
-[db_slave]
+[slave]
 slave
