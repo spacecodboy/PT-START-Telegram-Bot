@@ -45,20 +45,34 @@ def connectToLinux(request): # Подключение к Linux
     return data
 
 def connectToPostgresLogs(): # Подключение к серевру БД
-    host = os.getenv('RM_HOST')
-    port = os.getenv('RM_PORT')
-    username = os.getenv('RM_USER')
-    password = os.getenv('RM_PASSWORD')
+    host = os.getenv('HOST_DB')
+    port = os.getenv('PORT_DB')
+    username = os.getenv('USER_DB')
+    password = os.getenv('PASSWORD_DB')
 
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostname=host, username=username, password=password, port=port)
 
-    stdin, stdout, stderr = client.exec_command("docker compose logs db | grep replication | tail -n 10")
-    data = stdout.read() + stderr.read()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    sftp_client = client.open_sftp()
+    remote_file_path = '/var/log/postgresql/postgresql-15-main.log'  # Путь к файлу логов
 
+    replication_logs = [] # Поиск логов репликации
+    with sftp_client.open(remote_file_path, 'r') as remote_file:
+        for line in remote_file:
+            if "replication" in line:
+                replication_logs.append(line)
+                if len(replication_logs) > 10: # Вывод последних 10 записей
+                    replication_logs.pop(0)
+
+    # Отправка накопленных сообщений в Telegram
+    data = ''
+    for log_entry in replication_logs:
+        data += f'{log_entry}\n'
+    
+    sftp_client.close()
     client.close()
+
     return data
 
 
