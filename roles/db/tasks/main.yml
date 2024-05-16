@@ -4,6 +4,7 @@
     - postgresql-15
     - postgresql-contrib
     - net-tools
+    - python3-psycopg2
 
 - name: Allowing connections to PostgreSQL
   lineinfile:
@@ -99,9 +100,7 @@
       ('8(905)-376-99-45');
   become_user: postgres
 
-- name: Grant read permission to a specific user
-  acl:
+- name: Grant read permission
+  file:
     path: /var/log/postgresql/postgresql-15-main.log
-    entity: "{{ ansible_user }}"
-    etype: user
-    permissions: r
+    mode: "o+r"
