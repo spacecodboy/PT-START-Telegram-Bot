@@ -1,4 +1,4 @@
 ansible_host: "{{ ansible_repl_host }}"
-ansible_user: 
-ansible_password: 
-ansible_become_pass: 
+ansible_user: slave
+ansible_password: qwerty
+ansible_become_pass: qwerty
