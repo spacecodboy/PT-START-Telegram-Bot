@@ -12,7 +12,7 @@
     insertafter: EOF
     state: present
   notify:
-    - Restart db
+    - Restart PostgreSQL
 
 - name: Flush handlers
   meta: flush_handlers
@@ -31,7 +31,7 @@
   become_user: postgres
   with_dict: {archive_mode: "on", archive_command: "cp %p /data/WAL/archive/%f", max_wal_senders: 10, wal_level: replica, wal_log_hints: "on", listen_addresses: '*', port: "{{ PORT }}", log_replication_commands: "on"}
   notify:
-    - Restart db
+    - Restart PostgreSQL
 
 - name: Flush handlers
   meta: flush_handlers

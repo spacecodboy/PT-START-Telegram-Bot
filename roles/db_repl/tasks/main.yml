@@ -12,7 +12,7 @@
   become_user: postgres
   with_dict: {listen_addresses: "{{ ansible_master_host }}", port: "{{ PORT }}"}
   notify:
-    - Restart db
+    - Restart PostgreSQL
 
 - name: Flush handlers
   meta: flush_handlers
