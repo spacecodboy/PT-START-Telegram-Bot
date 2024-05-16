@@ -1,23 +1,21 @@
-- name: Install packages
+- name: Install PostgreSQL 
   apt: "name={{ item }} state=present"
   with_items:
     - postgresql-15
     - postgresql-contrib
     - net-tools
 
-- name: Access login postgres
+- name: Allowing connections to PostgreSQL
   lineinfile:
     path: /etc/postgresql/15/main/pg_hba.conf
-    line: "host all all {{ hostvars[inventory_hostname]['ansible_host'] }}/32 trust"
+    line: "host replication {{ user_replication }} {{ ansible_repl_host }}/32 scram-sha-256\nhost all all {{ hostvars[inventory_hostname]['ansible_host'] }}/32 password"
     insertafter: EOF
     state: present
   notify:
     - Restart db
 
-
 - name: Flush handlers
   meta: flush_handlers
-
 
 - name: Create WAL directory
   ansible.builtin.file:
@@ -26,8 +24,7 @@
     owner: postgres
     group: postgres
 
-
-- name: Set Postgres settings
+- name: Configure PostgreSQL connections
   community.postgresql.postgresql_set:
     name: "{{ item.key }}"
     value: "{{ item.value }}"
@@ -39,7 +36,7 @@
 - name: Flush handlers
   meta: flush_handlers
 
-- name: Create Replicator
+- name: Create user for replication
   community.postgresql.postgresql_user:
     name: "{{ user_replication }}"
     password: "{{ password_replication }}"
@@ -47,54 +44,64 @@
     port: "{{ PORT }}"
   become_user: postgres
 
-- name: Create user
+- name: Set password for postgres user
   community.postgresql.postgresql_user:
-    name: "{{ USER_NAME }}"
-    password: "{{ PASSWORD_USER }}"
+    name: postgres
+    password: "{{ DB_PASSWORD }}"
     port: "{{ PORT }}"
   become_user: postgres
 
-- name: Create DataBases
+
+- name: Create database 'telegram bot'
   community.postgresql.postgresql_db:
-    name: "{{ DB_NAME  }}"
-    owner: "{{ USER_NAME }}"
+    name: "{{ DB_DATABASE  }}"
+    owner: "{{ DB_USER }}"
     port: "{{ PORT }}"
   become_user: postgres
 
-- name: Create Table emails
+- name: Create table 'emails'
   community.postgresql.postgresql_table:
-    db: "{{ DB_NAME }}"
+    db: "{{ DB_DATABASE }}"
     table: "emails"
-    owner: "{{ USER_NAME }}"
+    owner: "{{ DB_USER }}"
     port: "{{ PORT }}"
     columns:
       - id SERIAL PRIMARY KEY
       - email VARCHAR(100) NOT NULL
   become_user: postgres
 
-- name: Create Table phone_numbers
+- name: Create table 'phone_numbers'
   community.postgresql.postgresql_table:
-    db: "{{ DB_NAME }}"
+    db: "{{ DB_DATABASE }}"
     table: "phone_numbers"
-    owner: "{{ USER_NAME }}"
+    owner: "{{ DB_USER }}"
     port: "{{ PORT }}"
     columns:
       - id SERIAL PRIMARY KEY
       - phone_number VARCHAR(18)
   become_user: postgres
 
-- name: Replace pg_hba.conf
-  lineinfile:
-    path: /etc/postgresql/15/main/pg_hba.conf
-    regexp: "^host all all {{ hostvars[inventory_hostname]['ansible_host'] }}/32 trust$"
-    line: "host replication {{ user_replication }} {{ ansible_repl_host }}/32 md5\nhost all all {{ hostvars[inventory_hostname]['ansible_host'] }}/32 password"
-  notify:
-    - Restart db
+- name: Insert emails into the 'emails' table
+  community.postgresql.postgresql_query:
+    db: "{{ DB_DATABASE }}"
+    query: |
+      INSERT INTO emails (email) VALUES 
+      ('ivan.pepe@nstu.ru'), 
+      ('olga.petrova@gmail.com');
+  become_user: postgres
 
-- name: Flush handlers
-  meta: flush_handlers
+- name: Insert phone numbers into the 'phone_numbers' table
+  community.postgresql.postgresql_query:
+    db: "{{ DB_DATABASE }}"
+    query: |
+      INSERT INTO phone_numbers (phone_number) VALUES 
+      ('+7 (900) 567 21 22'), 
+      ('8(905)-376-99-45');
+  become_user: postgres
 
-- name: Set permissions for other to read
-  file:
-    path: /var/log/postgresql/postgresql-15-main.log
-    mode: "o+r"
+- name: Grant read permission to a specific user
+      acl:
+        path: /var/log/postgresql/postgresql-15-main.log
+        entity: "{{ ansible_user }}"
+        etype: user
+        permissions: r

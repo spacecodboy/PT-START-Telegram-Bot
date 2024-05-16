@@ -3,6 +3,6 @@ ansible_user: user
 ansible_password: qwerty
 ansible_become_pass: qwerty
 
-DB_NAME: "telegram_bot"
-USER_NAME: "postgres"
-PASSWORD_USER: "Qq12345"
+DB_DATABASE: "telegram_bot"
+DB_USER: "postgres"
+DB_PASSWORD: "Qq12345"

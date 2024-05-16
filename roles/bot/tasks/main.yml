@@ -1,5 +1,5 @@
 
-- name: "Install packages"
+- name: Install packages
   apt: "name={{ item }} state=present"
   with_items:
     - python3-full
@@ -14,23 +14,23 @@
       - python3-pip
     state: present
 
-- name: Clone repository
+- name: Clone repository from git
   git:
     repo: https://github.com/spacecodboy/PT-START-Telegram-Bot.git
-    dest: /home/user/bot/
+    dest: /home/{{ ansible_user }}/bot/
     version: bot
 
-- name: Activate Environment
+- name: Configure environment
   pip:
-    requirements: /home/user/bot/requirments.txt
-    virtualenv: /home/user/venv
+    requirements: /home/{{ ansible_user }}/bot/requirments.txt
+    virtualenv: /home/{{ ansible_user }}/venv
 
 - name: Copy .env
   copy:
     src: ./.env
-    dest: /home/user/bot/
+    dest: /home/{{ ansible_user }}/bot/
 
-- name: Start Bot
+- name: Start tg-bot
   shell:
-    chdir: /home/user/bot
+    chdir: /home/{{ ansible_user }}/bot
     cmd: "../venv/bin/python main.py"
