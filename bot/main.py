@@ -45,10 +45,10 @@ def connectToLinux(request): # Подключение к Linux
     return data
 
 def connectToPostgresLogs(): # Подключение к серевру БД
-    host = os.getenv('RM_HOST')
-    port = os.getenv('RM_PORT')
-    username = os.getenv('RM_USER')
-    password = os.getenv('RM_PASSWORD')
+    host = os.getenv('DB_HOST')
+    port = os.getenv('DB_LOG_PORT')
+    username = os.getenv('DB_LOG_USER')
+    password = os.getenv('DB_LOG_PASSWORD')
 
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
