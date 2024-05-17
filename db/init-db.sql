@@ -1,6 +1,6 @@
 \c telegram_bot
 
-CREATE ROLE repl_user WITH REPLICATION LOGIN PASSWORD 'Qq12345';
+CREATE ROLE repl_user WITH REPLICATION LOGIN ENCRYPTED PASSWORD 'Qq12345';
 SELECT pg_create_physical_replication_slot('replication_slot');
 
 CREATE TABLE emails (
