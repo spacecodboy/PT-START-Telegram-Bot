@@ -6,7 +6,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Conve
 import postgres_db
 from datetime import datetime
 
-find = find_dotenv()
+find_dotenv()
 load_dotenv() # Подключение модуля dotenv
 
 TOKEN = os.getenv('TOKEN') # Токен бота
@@ -45,7 +45,7 @@ def connectToLinux(request): # Подключение к Linux
     return data
 
 def connectToPostgresLogs(): # Подключение к серевру БД
-    host = os.getenv('DB_HOST')
+    host = os.getenv('DB_LOG_HOST')
     port = os.getenv('DB_LOG_PORT')
     username = os.getenv('DB_LOG_USER')
     password = os.getenv('DB_LOG_PASSWORD')
@@ -54,7 +54,7 @@ def connectToPostgresLogs(): # Подключение к серевру БД
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostname=host, username=username, password=password, port=port)
 
-    stdin, stdout, stderr = client.exec_command("docker compose logs db | grep replication | tail -n 10")
+    stdin, stdout, stderr = client.exec_command("cd Telegram-Bot-Postgres && docker compose logs db | grep replication | tail -n 10")
     data = stdout.read() + stderr.read()
     data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
 
