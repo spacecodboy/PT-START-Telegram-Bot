@@ -1,6 +1,6 @@
 services:
   bot:
-    image: 192.168.0.40:5000/bot_image:latest
+    image: bot_image:latest
     restart: unless-stopped
     env_file:
       - .env
@@ -8,7 +8,7 @@ services:
       - db
 
   db:
-    image:  192.168.0.40:5000/db_image:latest
+    image:  db_image:latest
     ports:
       - "5432:5432"
     restart: unless-stopped
@@ -29,7 +29,7 @@ services:
       -c log_filename='postgresql-%Y-%m-%d.log'
 
   db_replica:
-    image:  192.168.0.40:5000/db_repl_image:latest
+    image:  db_repl_image:latest
     ports:
       - "5433:5432"
     restart: unless-stopped
