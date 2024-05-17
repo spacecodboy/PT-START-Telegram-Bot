@@ -45,7 +45,7 @@ def connectToLinux(request): # Подключение к Linux
     return data
 
 def connectToPostgresLogs(): # Подключение к серевру БД
-    host = os.getenv('DB_HOST')
+    host = os.getenv('DB_LOG_HOST')
     port = os.getenv('DB_LOG_PORT')
     username = os.getenv('DB_LOG_USER')
     password = os.getenv('DB_LOG_PASSWORD')
